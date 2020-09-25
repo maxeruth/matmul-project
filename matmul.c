@@ -22,6 +22,10 @@
 #ifndef FLAGS
 #  define FLAGS "unknown"
 #endif
+#ifndef DEBUG_RUN
+#  define DEBUG_RUN "unknown"
+#endif
+
 
 /*
   Your function _MUST_ have the following signature:
