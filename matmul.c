@@ -46,8 +46,9 @@ extern void square_dgemm();
   around some of the powers-of-two.
 */
 const int test_sizes[] = {
+    16, 32, 64, 128
 	// Adding 4,8,16
-	4, 8, 12, 16, 32, 64
+	// 4, 8, 12, 16, 32, 64
 	// 128, 256, 512, 1024
     //4, 8, 16, 31, 32, 96, 97, 127, 128, 129, 191, 192, 229,
 #if defined(DEBUG_RUN)
