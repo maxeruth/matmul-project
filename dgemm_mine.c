@@ -26,7 +26,7 @@ void copy_back(const int M, double* restrict A_OUT, fvec_t* restrict A_IN)
     int N = M % MBLOCK == 0 ? M / MBLOCK : M / MBLOCK + 1;
     for (i = 0; i < N; ++i) {
         for (j = 0; j < N; ++j) {
-            copy_block(M, A_OUT + MBLOCK * M * i + MBLOCK * j, A_IN[i * N + j].vec);
+            copy_block_back(M, A_OUT + MBLOCK * M * i + MBLOCK * j, A_IN[i * N + j].vec);
         }
     }
 }
