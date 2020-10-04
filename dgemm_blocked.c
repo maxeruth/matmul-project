@@ -12,7 +12,7 @@ const char* dgemm_desc = "Simple blocked dgemm.";
   lda is the leading dimension of the matrix (the M of square_dgemm).
 */
 void basic_dgemm(const int lda, const int M, const int N, const int K,
-                 const double *A, const double *B, double *C)
+                 const double* restrict A, const double* restrict B, double* restrict C)
 {
     int i, j, k;
     for (j = 0; j < N; ++j) {
@@ -25,7 +25,7 @@ void basic_dgemm(const int lda, const int M, const int N, const int K,
 }
 
 void do_block(const int lda,
-              const double *A, const double *B, double *C,
+              const double* restrict A, const double* restrict B, double* restrict C,
               const int i, const int j, const int k)
 {
     const int M = (i+BLOCK_SIZE > lda? lda-i : BLOCK_SIZE);
