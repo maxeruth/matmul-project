@@ -1,5 +1,5 @@
 # Versions to build
-BUILDS=best mine mine2 basic blocked blocked_kji f2c
+BUILDS=best copy_B mine2 basic blocked blocked_kji f2c
 # BUILDS=mine mine2 basic blocked f2c 
 
 # C and Fortran compilers
