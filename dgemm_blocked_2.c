@@ -1,8 +1,13 @@
 const char* dgemm_desc = "Simple blocked dgemm.";
 
+
 #ifndef BLOCK_SIZE
-#define BLOCK_SIZE ((int) 16)
+#define BLOCK_SIZE ((int) 32)
 #endif
+int min(int M, int N)
+{
+    return M < N ? M : N;
+}
 
 /*
   A is M-by-K
@@ -18,9 +23,11 @@ void square_dgemm(const int M, const double* restrict A, const double* restrict 
     for (kk = 0; kk < n_blocks; ++kk) {
         for (ii = 0; ii < n_blocks; ++ii) {
             for (j = 0; j < M; ++j) {
-		    for (k = kk*BLOCK_SIZE; k <(kk+1)*BLOCK_SIZE; ++k) {
+		    int kmin=min( (kk+1)*BLOCK_SIZE, M);
+		    for (k = kk*BLOCK_SIZE; k <kmin; ++k) {
 			    const double r=B[j*M+k];
-                	for (i=ii*BLOCK_SIZE; i< (ii+1)*BLOCK_SIZE;++i){
+                	int imin=min( (ii+1)*BLOCK_SIZE, M);
+			    for (i=ii*BLOCK_SIZE; i< imin;++i){
 			       C[j*M+i]+=A[k*M+i]*r;	
             }
         }
