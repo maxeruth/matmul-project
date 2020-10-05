@@ -34,8 +34,9 @@ void multiply_block(int M, int jj, int kk, int J, int K, const double* restrict 
 
 	for (j = 0; j < J; j++) {
 		for (k = 0; k < K; k++) {
+			const double r=B_BLOCK[j*BLOCK_SIZE+k]; 
 			for (i = 0; i < M; i++) {
-				C[j*M+i] += A[k*M+i]*B_BLOCK[j*BLOCK_SIZE+k];
+				C[j*M+i] += A[k*M+i]*r;
 			}
 		}
 	}
