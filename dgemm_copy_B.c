@@ -9,7 +9,7 @@ const char* dgemm_desc = "Adding a temporary variable for best.";
 #include <omp.h>
 
 #ifndef BLOCK_SIZE
-#define BLOCK_SIZE ((int) 16)
+#define BLOCK_SIZE ((int) 32)
 #endif
 
 #ifndef ALIGN_SIZE
