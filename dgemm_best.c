@@ -9,7 +9,7 @@ int min(int M, int N)
     return M < N ? M : N;
 }
 
-void square_dgemm(const int M, 
+void square_dgemm(const int M, double r,
                   const double* restrict A, const double* restrict B, double* restrict C)
 {
     int i, j, k, kk, jj;
@@ -20,8 +20,9 @@ void square_dgemm(const int M,
         for (jj = 0; jj < en; jj += BLOCK_SIZE) {
             for (j = jj; j < min(jj + BLOCK_SIZE, M); j++) {
                 for (k = kk; k < min(kk + BLOCK_SIZE, M); k++) {
+			r=B[j*M+k];
                     for (i = 0; i < M; i++) {
-                        C[j*M+i] += A[k*M+i]*B[j*M+k];
+                        C[j*M+i] += A[k*M+i]*r;
                     }
                 }
             }

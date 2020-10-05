@@ -17,8 +17,9 @@ void basic_dgemm(const int lda, const int M, const int N, const int K,
     int i, j, k;
     for (j = 0; j < N; ++j) {
         for (k = 0; k < K; ++k) {
+		const double r=B[j*lda+k];
             for (i = 0; i < M; ++i) {
-                C[j*lda+i] += A[k*lda+i] * B[j*lda+k];
+                C[j*lda+i] += A[k*lda+i] * r;
             }
         }
     }
