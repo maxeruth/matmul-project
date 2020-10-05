@@ -1,7 +1,7 @@
 const char* dgemm_desc = "Just the restrict keyword.";
 
 #ifndef BLOCK_SIZE
-#define BLOCK_SIZE ((int) 16)
+#define BLOCK_SIZE ((int) 128)
 #endif
 
 int min(int M, int N)
