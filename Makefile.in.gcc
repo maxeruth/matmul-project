@@ -1,6 +1,6 @@
 # Versions to build
-BUILDS=jki jki_without_restrict
-# BUILDS=best copy_B mine2 basic blocked blocked_2 blocked_kji f2c 
+#BUILDS=jki jki_without_restrict
+ BUILDS=best blas copy_B mine2 basic blocked f2c 
 
 # C and Fortran compilers
 CC=gcc
@@ -25,5 +25,5 @@ LIBS = -lm
 OBJS = matmul.o
 
 # Libraries and include files for BLAS
-LIBBLAS=`pkg-config --libs cblas`
-INCBLAS=`pkg-config --cflags cblas`
+LIBBLAS=`pkg-config --libs openblas`
+INCBLAS=`pkg-config --cflags openblas`
