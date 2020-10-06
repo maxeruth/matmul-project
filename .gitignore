@@ -1,4 +1,6 @@
 *.txt
 *.o
+*.csv
 timing-*
 matmul-*
+!results/*
