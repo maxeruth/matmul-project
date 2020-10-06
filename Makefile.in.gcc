@@ -1,6 +1,6 @@
 # Versions to build
 #BUILDS=jki jki_without_restrict
- BUILDS=best blas copy_B mine2 basic blocked f2c 
+ BUILDS=8_block 16_block 24_block 32_block 48_block 64_block 
 
 # C and Fortran compilers
 CC=gcc
