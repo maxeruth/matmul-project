@@ -1,6 +1,6 @@
 # Versions to build
 #BUILDS=jki jki_without_restrict
- BUILDS=8_block 16_block 24_block 32_block 48_block 64_block 
+ BUILDS=8_block 16_block 32_block 64_block 96_block 128_block jki blas
 
 # C and Fortran compilers
 CC=gcc
