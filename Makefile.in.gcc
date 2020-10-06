@@ -2,7 +2,9 @@
 #BUILDS=jki jki_without_restrict
 #BUILDS=8_block 16_block 32_block 64_block 96_block 128_block 
 #BUILDS=64_block basic blas f2c blocked 
-BUILDS=jki_without_restrict jki_registering jki ijk ikj jik kij kji 64_block 64_block_without_registering
+#BUILDS=jki_without_restrict jki_registering jki ijk ikj jik kij kji 64_block 64_block_without_registering
+BUILDS=64_block 64_snake_block
+
 
 # C and Fortran compilers
 CC=gcc

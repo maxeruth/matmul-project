@@ -46,30 +46,52 @@ Of course, there are likely many more compiler options that could have been cons
 
 
 \section{Discussion: the Inner Kernel}
-Plot: restrict vs. not restrict
+The full code for our best inner kernel (found in \texttt{dgemm\_jki.c}) is given by:
+\begin{verbatim}
+void square_dgemm(const int M, 
+                  const double* restrict A, const double* restrict B, double* restrict C)
+{
+    int i, j, k;
+   
+    for (j = 0; j < M; ++j) {			
+        for (k = 0; k < M; ++k){
+            for (i = 0; i < M; ++i) {
+                C[j*M+i] += A[k*M+i] * B[j*M+k];
+            }
+        }
+    }
+}
+\end{verbatim}
 
-\subsection{The \texttt{restrict} Keyword}
-\begin{figure}[h!]
+There are two major differences between this code and that of \texttt{dgemm\_basic.c}. First, this code has takes advantage of the \texttt{restrict} keyword when passing \texttt{A}, \texttt{B}, and \texttt{C}. This notifies the code that these matrices do not share pointers, and thus the output of \texttt{A[k*M+i] * B[j*M+k]} does not depend on the previous updates to the value of \texttt{C[j*M+i]}, allowing for GCC to vectorize the code appropriately. 
+
+The difference between the loop with \texttt{restrict} and without is show in Fig.~\ref{fig:timing-jki-restrict}. We see that the Gflop rate of the \texttt{restrict} code is approximately twice that of the code for smaller matrices. This is because the computation in these situations is limited primarily by the processor and not by memory. For larger matrices, the primary limitation on computation speed moves to be memory, and the relative performances narrow, as neither is better than the other for memory hit rates.
+
+
+\begin{figure}
     \centering
-    \includegraphics[width=0.8\columnwidth]{timing_jki_restrict.pdf}
-    \caption{Flop rates with and without the \texttt{restrict} keyword.}
-    \label{fig:Restrict}
+    \includegraphics[width=0.6\columnwidth]{timing_jki_restrict.pdf}
+    \caption{Flop rates for the inner \texttt{jki} kernel with and without the \texttt{restrict} keyword.}
+    \label{fig:timing-jki-restrict}
 \end{figure}
 
+The second difference is the loop order. The \texttt{dgemm\_basic.c} code loops through the matrix multiplication in the \texttt{ijk} order, meaning the outside loop is in \texttt{i}, the middle is in \texttt{j}, and the inner is in \texttt{k}. However, this loop order is not particularly good for memory locality, as each iteration of the inner loop requires drawing upon an element of \texttt{A} that is \texttt{8M} bytes away. Note this is particularly important for the inner loop, as it is incremented a factor of \texttt{M} times more iterations than the middle loop and \texttt{M\^{}2} times more than the outer loop. Loading these elements quickly in succession is more difficult for this reason.
 
+To address the locality issue, we choose the inner loop to be over \texttt{i}. This is because only the \texttt{i} iteration is local in all three matrices \texttt{A}, \texttt{B}, and \texttt{C}. The middle loop would then be over \texttt{k}, which has good locality in \texttt{B}, but not in \texttt{C}. Finally, the outer loop would be over \texttt{j}, which has the worst memory locality. 
 
-\subsection{Loop Order}
-In the basic algorithm, matrix multiplication of two $M\times M$ matrices is performed in a sequence of three nested loops:
-\\do i=1,M;	do j=1,M;	do k=1,M
-\\ C[i,j]+=A[i,k]*B[k,j]\\
-The loop order written as above is ijk.
-The sequence of the i, j and k loops does not influence the accuracy of the calculation or the number of individual calculations. However, it has a profound effect on the time required due to the column major storage of arrays. This can be quantitatively observed in figure \ref{fig:LoopOrder}. As the data is stored in the column major format, accessing C is faster if we first loop through the rows of a given column first. Hence, having i loop as the inner most loop is fastest i.e. the plots labelled as jki and kji in figure \ref{fig:LoopOrder}. Same logic applies while accessing the elements of the array B and looping through the rows of B i.e. the k loop before the columns i.e. the j loop is more efficient than vice versa. Hence, jki is faster than kji in figure \ref{fig:LoopOrder}. In the rest of the report jki loop order is assumed.
-\begin{figure}[h!]
+We find that the numerical experiments shown in Fig.~\ref{fig:timing-loop-order} confirm this intuition. The two loop orders where \texttt{i} is the inner variable are faster than the rest, with the \texttt{jki} being the fastest of them all. 
+
+\begin{figure}
     \centering
-    \includegraphics[width=0.8\columnwidth]{timing_loop_order.pdf}
-    \caption{Flop rates for each of the six possible loop orders for the kernel.}
-    \label{fig:LoopOrder}
+    \includegraphics[width=0.6\columnwidth]{timing_loop_order.pdf}
+    \caption{Flop rates for each of the six possible loop orders for the inner kernel.}
+    \label{fig:timing-loop-order}
 \end{figure}
+
+We can learn a few other things from Fig.~\ref{fig:timing-loop-order}. For instance, it appears that when comparing between dimensions that are powers of two and their neighbors (such as the run 255, 256, and 257), the speed of the code can be significantly different. We believe this is likely related to associative caching. However, for small matrices that fit entirely into cache, it is unclear exactly why this would be an issue. We also see that these basic loop routines are strongest for small matrices, and tend to become significantly worse for large dimension. This could be interpreted via the roofline model, where smaller dimensions are bounded by flop rate (on the right side of the roofline) and the larger dimensions are bounded by memory efficiency (the left side of the roofline).
+
+
+
 
 \subsection{Register Allocate}\label{sec:RegisterAllocate}
 Considering the jki loop order, the innermost loop reuses B[k,j]. Thus it can be register allocated such that it is fetched from the memory only once. \footnote{\label{Ref1}Lam MD, Rothberg EE, Wolf ME. The cache performance and optimizations of blocked algorithms. ACM SIGOPS Operating Systems Review. 1991 Apr 1;25(Special Issue):63-74.} Practically this implies changing the algorithm to:  
